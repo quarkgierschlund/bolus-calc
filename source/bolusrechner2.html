@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html  lang="de">
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="description" content="Mit Kohlenhydraten und aktuellem Blutzucker den Insulin-Bolus online berechnen mit BE/KHE-Faktor und Korrekturfaktor">
+    <meta name="keywords" content="Bolus, Bolusrechner, online-Bolusrechner, Insulin, Insulinrechner, Kohlenhydrate, Blutzucker, BZ, Korrekturfaktor, KG, berechnen, Diabetes">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" href="stylebolusrechner.css">
+    <title>Bolusrechner</title>
+</head>
+<body>
+
+
+    <table class="menue">
+        <tr>
+            <td style="text-align: center " class="auto-style3">Bolusrechner <span style="font-size: xx-small">(mmol/l)</span></td>
+            <td style="width: 60px; text-align: left; color: white ">
+                <details>
+                    <summary id="summary" style="font-size: xx-large;">&equiv;</summary>
+                    <ul>
+                        <li><a href="#Einstellung" style="color: white ">Einstellungen</a></li>
+                        <li>
+                            <a href="https://www.diabsite.de/ernaehrung/be-tabellen/be-a-z.html" style="color: white ">
+                                KH-Tabelle
+                            </a>
+                        </li>
+                        <li>
+                            <a href="https://www.alexeberth.bplaced.net/wordpress/patienteninformationen/" style="color: white ">
+                                zur Praxis
+                            </a>
+                        </li>
+                    </ul>
+                </details>
+            </td>
+        </tr>
+    </table>
+    <label class="sport-chk"><input type="checkbox" id="sport" oninput="sportfarbe()" />Sport nächste 2 Stunden</label>
+
+    <table style="width: 100%">
+        <tr>
+            <td style="width: 80%">
+                aktueller BZ:  <span id="demoBZ" style="font-size:40px"></span>
+                mmol/l
+            </td>
+        </tr>
+    </table>
+
+    <input oninput="allesberechnen()" type="range" min=".1" max="30" value="6" class="slider" id="bzRange" step=".1" style="margin-left:20px; width: 90%">
+
+    <table style=" text-align: center ; width: 100%; padding: -5px;">
+        <tr style="font-size: 8px">
+            <td style="width: 8%">Zeit:</td>
+            <td style="width: 24%">früh</td>
+            <td style="width: 24%">mittags</td>
+            <td style="width: 24%">abends</td>
+            <td style="width: 24%">nachts</td>
+        </tr>
+        <tr>
+            <td style="width: 8%; font-size: 8px">Korr.-IE</td>
+            <td style="width: 24%"><span id="eKIf"></span> IE</td>
+            <td style="width: 24%"><span id="eKIm"></span> IE</td>
+            <td style="width: 24%"><span id="eKIa"></span> IE</td>
+            <td style="width: 24%"><span id="eKIs"></span> IE</td>
+        </tr>
+    </table>
+    <hr>
+    <div class="slidecontainer">
+        <p>
+            Kohlenhydrate:  <span id="demoKH" style="font-size:40px"></span> g &nbsp;   &cong;<span id="khes">0</span> KHE &nbsp; &cong;<span id="bes">0</span> BE
+
+            <input oninput="allesberechnen()" type="range" min="0" max="150" value="0" class="slider" id="khRange" style="margin-left:20px; width:90%">
+        </p>
+    </div>
+    <table style="text-align: center; width: 100%; padding: -5px; ">
+        <tr style="font-size: 8px">
+            <td style="width: 8%">Zeit:</td>
+            <td style="width: 24%">früh</td>
+            <td style="width: 24%">mittags</td>
+            <td style="width: 24%">abends</td>
+            <td style="width: 24%">nachts</td>
+        </tr>
+        <tr>
+            <td style="font-size: 8px">KH-IEH</td>
+            <td><span id="BEIf"></span> IE</td>
+            <td><span id="BEIm"></span> IE</td>
+            <td><span id="BEIa"></span> IE</td>
+            <td><span id="BEIs"></span> IE</td>
+        </tr>
+    </table>
+    <hr>
+
+
+
+    <table style="text-align: center; width : 100%">
+        <tr style="font-size: large; font-weight:bold;">
+            <td style="width: 8%">Zeit:</td>
+            <td style="width: 24%">früh</td>
+            <td style="width: 24%">mittags</td>
+            <td style="width: 24%">abends</td>
+            <td style="width: 24%">nachts</td>
+        </tr>
+        <tr style="background-color: #d6f5f5;">
+            <td style="font-size: 18px">Total</td>
+            <td>
+                <span id="TotalIf" style="font-size:26px;font-weight:bold"></span><br />
+                IE
+            </td>
+            <td>
+                <span id="TotalIm" style="font-size:26px;font-weight:bold"></span><br />
+                IE
+            </td>
+            <td>
+                <span id="TotalIa" style="font-size:26px;font-weight:bold"></span><br />
+                IE
+            </td>
+            <td>
+                <span id="TotalIs" style="font-size:26px;font-weight:bold"></span><br />
+                IE
+            </td>
+        </tr>
+        <tr style="background-color: #f2f2f2; font-size:small;">
+            <td><button onclick="aktivesInsulinberechnen();" style="width: 70px; height: 50px; background-color: #33cccc; color: white; border-radius: 10px">aktives<br>Insulin?</button></td>
+            <td id="aktIf"></td>
+            <td id="aktIm"></td>
+            <td id="aktIa"></td>
+            <td id="aktIs"></td>
+        </tr>
+    </table>
+
+    <table>
+        <tr>
+            <td style="font-size: x-small;color:white; width:100px;">
+                <span id="restIf"></span>
+                <span id="restIm"></span>
+                <span id="restIa"></span>
+                <span id="restIs"></span>
+            </td>
+            <td>
+                <button onclick="aktivesInsulin();" style="width: 200px; height: 50px; ">
+                    Insulin-Abgabe speichern
+                </button>
+            </td>
+        </tr>
+    </table>
+    <br>
+    <br /><br /><br /><br />
+
+    <a name="Einstellung"></a>
+    <table class="menue" style="text-align: center; ">
+        <tr>
+            <td class="auto-style3">Einstellungen:</td>
+        </tr>
+        <tr>
+            <td class="auto-style4">Nach Änderungen bitte KH und BZ neu eingeben!</td>
+        </tr>
+    </table>
+
+    <br><br>
+    <b>Mahlzeiten-Insulin </b><span class="auto-style1">(IE pro 10 g Kohlenhydrate)</span>
+    <table>
+        <tr>
+            <td style="width: 100px; ">früh</td>
+            <td style="width: 100px; text-align: center ">
+                <button onclick="BEFfm(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="width: 100px; text-align: center "><input type="number" class="eingabe1" step=".1" id="BEFf"></td>
+            <td style="width: 100px; text-align: center ">
+                <button onclick="BEFfp(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>mittags</td>
+            <td style="text-align: center ">
+                <button onclick="BEFmm(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="text-align: center "><input type="number" class="eingabe1" step=".1" id="BEFm"></td>
+            <td style="text-align: center ">
+                <button onclick="BEFmp(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>abends</td>
+            <td style="text-align: center ">
+                <button onclick="BEFam(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="text-align: center "><input type="number" class="eingabe1" step=".1" id="BEFa"></td>
+            <td style="text-align: center ">
+                <button onclick="BEFap(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>nachts</td>
+            <td style="text-align: center ">
+                <button onclick="BEFsm(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="text-align: center "><input type="number" class="eingabe1" step=".1" id="BEFs"></td>
+            <td style="text-align: center ">
+                <button onclick="BEFsp(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+    </table>
+    <hr />
+    <b>Korrektur </b><span class="auto-style1">(1 IE senkt BZ um * mmol/dl)</span>
+    <table >
+        <tr>
+            <td style="width: 100px">früh</td>
+            <td style="width: 100px; text-align : center ">
+                <button onclick="KFfm(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="width: 100px; text-align: center "><input type="number" class="eingabe1" step=".1" id="KFf"></td>
+            <td style="width: 100px; text-align: center ">
+                <button onclick="KFfp(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>mittags</td>
+            <td style="text-align: center ">
+                <button onclick="KFmm(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="text-align: center "><input type="number" class="eingabe1" step=".1" id="KFm"></td>
+            <td style="text-align: center ">
+                <button onclick="KFmp(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>abends</td>
+            <td style="text-align: center ">
+                <button onclick="KFam(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="text-align: center "><input type="number" class="eingabe1" step=".1" id="KFa"></td>
+            <td style="text-align: center ">
+                <button onclick="KFap(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>nachts</td>
+            <td style="text-align: center ">
+                <button onclick="KFsm(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="text-align: center "><input type="number" class="eingabe1" step=".1" id="KFs"></td>
+            <td style="text-align: center ">
+                <button onclick="KFsp(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+    </table>
+    <hr />
+    <b>Ziel-BZ: </b><span class="auto-style1">(mg/dl)</span>
+    <table>
+        <tr>
+        <tr>
+            <td style="width: 100px">früh</td>
+            <td style="width: 100px; text-align: center ">
+                <button onclick="ZBZfm(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="width: 100px; text-align: center "><input type="number" class="eingabe1" step=".1" id="ZBZf"></td>
+            <td style="width: 100px; text-align: center ">
+                <button onclick="ZBZfp(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>mittags</td>
+            <td style="text-align: center ">
+                <button onclick="ZBZmm(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="text-align: center "><input type="number" class="eingabe1" step=".1" id="ZBZm"></td>
+            <td style="text-align: center ">
+                <button onclick="ZBZmp(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>abends</td>
+            <td style="text-align: center ">
+                <button onclick="ZBZam(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="text-align: center "><input type="number" class="eingabe1" step=".1" id="ZBZa"></td>
+            <td style="text-align: center ">
+                <button onclick="ZBZap(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>nachts</td>
+            <td style="text-align: center ">
+                <button onclick="ZBZsm(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="text-align: center "><input type="number" class="eingabe1" step=".1" id="ZBZs"></td>
+            <td style="text-align: center ">
+                <button onclick="ZBZsp(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+    </table>
+    <hr>
+    <b>Insulin-Wirkdauer: </b><span class="auto-style1">(Stunden)</span>
+    <table>
+        <tr>
+        <tr>
+            <td style="width: 100px"></td>
+            <td style="width: 100px; text-align: center ">
+                <button onclick="Iwirkm(); allesberechnen()" class="pmbutton">
+                    -
+                </button>
+            </td>
+            <td style="width: 100px; text-align: center "><input type="number" class="eingabe1" step=".1" id="Iwirk" min="0.5"></td>
+            <td style="width: 100px; text-align: center ">
+                <button onclick="Iwirkp(); allesberechnen()" class="pmbutton">
+                    +
+                </button>
+            </td>
+        </tr>
+    </table>
+
+    <p class="menue" style="text-align: center; color:white;">
+        Nach Änderungen bitte KH und BZ neu eingeben!
+    </p>
+    <p style="max-width: 500px">
+        Sie haben die Möglichkeit, Ihre persönliche Diabetes-Einstellung in einer indexedDB
+        auf Ihrem Endgerät zu speichern. Dabei werden keine Daten ins Internet
+        übertragen. Der Bolusrechner wird dann immer mit Ihrer Einstellung starten. Die
+        Einstellungen bleiben so lange gespeichert bis Sie diese löschen.
+    </p>
+    <button type="button" id="einstellungenspeichern" onclick="saveSettings()" style="font-size: large ;width: 250px;height: 60px;">
+        Einstellungen speichern
+    </button>
+    <br>
+    <br>
+    <br>
+    <br>
+    <button type="button" id="einstellungenloeschen" onclick="deleteSettings()">
+        Einstellungen löschen
+    </button>
+
+
+    <script src="scriptbolusrechner2.js"></script>
+
+</body>
+</html>
